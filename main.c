@@ -4,14 +4,9 @@
 
 char genres[4][10]= {"romance", "fantasy", "thriller","sci-fi"};
 Book archive[MAX];
-int globalCounter = 0;
+//il counter globale è dentro al ciclo while del menu, altrimenti non si puo aggiornare.
 
 
 int main () {
-    insert_book(archive, globalCounter);
-    globalCounter++; // VEDERE SE SPOSTARE DAL MAIN (o si fa la funzione che torna sempre il valore incrementanto ed essendo dentro al ciclo lo aggiorna oppure si lascia qua ed idem nel ciclo)
-    insert_book(archive, globalCounter);
-    globalCounter++; 
-    SearchByCode(archive, globalCounter);
-    showAllBook(archive, globalCounter);
+    printMenu(archive);
 }

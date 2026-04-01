@@ -18,7 +18,7 @@ typedef struct
 //check functions 
 
 //quando è char la funzione non puo tornare una stringa intera, quindi non torniamo nulla ma assegnamo la stringa all'array inserito nei parametri
-void check_char_cicle(char prompt[], char dest[]){
+void checkCharCicle(char prompt[], char dest[]){
     while(1)
     {
         printf("%s", prompt);
@@ -35,7 +35,7 @@ void check_char_cicle(char prompt[], char dest[]){
 }
 
 //quando la funzione controlla i numeri torna sempre un float 
-float check_float_cicle(char prompt[]){
+float checkFloatCicle(char prompt[]){
     float a;
     while(1)
     {
@@ -47,7 +47,7 @@ float check_float_cicle(char prompt[]){
             continue;
         }
         if(a<=0){
-            printf("be positive");
+            printf("\nbe positive");
         }else{
             return a;
         }
@@ -56,15 +56,16 @@ float check_float_cicle(char prompt[]){
 
 //insert book function 
 
-void insert_book( Book arr[], int c) {
+int insertBook( Book arr[], int c) {
     arr[c].code = c;
-    check_char_cicle("\ninsert book title: ", arr[c].title);
-    check_char_cicle("\ninsert the book's author: ", arr[c].author);
-    arr[c].release_year = check_float_cicle("\ninsert book's release year: ");
-    arr[c].avaible_copies=check_float_cicle("\ninsert number of avaible copies: ");
-    arr[c].total_copies=check_float_cicle("\ninsert number of total copies: ");
-    arr[c].price=check_float_cicle("\ninsert the book's price per unit: ");
-    check_char_cicle("\ninsert the book's genre: ", arr[c].genre);
+    checkCharCicle("\ninsert book title: ", arr[c].title);
+    checkCharCicle("\ninsert the book's author: ", arr[c].author);
+    arr[c].release_year = checkFloatCicle("\ninsert book's release year: ");
+    arr[c].avaible_copies=checkFloatCicle("\ninsert number of avaible copies: ");
+    arr[c].total_copies=checkFloatCicle("\ninsert number of total copies: ");
+    arr[c].price=checkFloatCicle("\ninsert the book's price per unit: ");
+    checkCharCicle("\ninsert the book's genre: ", arr[c].genre);
+    return c + 1; 
 }
 
 //show all book registred function
@@ -77,7 +78,7 @@ void showAllBook( Book archive[] , int countArr) {
     
     for(int i =0 ; i<countArr ; i++){
 
-        printf("------ BOOK %d ------ \n", i);
+        printf("\n------ BOOK %d ------ \n", i);
         printf("Code:%d\n ",archive[i].code);
         printf("Title:%s\n ",archive[i].title);
         printf("Autor:%s\n ",archive[i].author);
@@ -97,7 +98,7 @@ void SearchByCode( Book archive[] , int countArr){
     int found = 0; 
 
     while (a) {
-        codeInsert = check_float_cicle("\nEnter the book code : ");
+        codeInsert = checkFloatCicle("\nEnter the book code : ");
         codeInsert = (int)codeInsert; //trasformo in intero
 
         for(int i=0 ; i<countArr ; i++){
@@ -120,6 +121,57 @@ void SearchByCode( Book archive[] , int countArr){
             printf("\nRetry: ");
         }
     }
+}
+
+void printMenu(Book bookArchive[]) {
+    int choice = 0;
+    int globalCounter = 0;
+    int cicleVar = 1;
+
+    while (cicleVar) {
+        printf("\n--- LIBRARY MANAGEMENT ---\n");
+        printf("1. Insert new book\n");
+        printf("2. Show all books\n");
+        printf("3. Search book by code\n");
+        printf("4. Update available copies\n");
+        printf("5. Update unit cost\n");
+        printf("6. Register loan\n");
+        printf("7. Register return\n");
+        printf("8. Calculate total archive value\n");
+        printf("9. Count books by genre\n");
+        printf("10. Find book with highest number of copies\n");
+        printf("11. Calculate average publication year\n");
+        printf("12. Exit\n");
+        choice = checkFloatCicle("\nChoose one operation: ");
+
+        switch (choice) {
+        case 1:
+            printf("\nYou choose to ---INSERT A NEW BOOK---");
+            if (globalCounter >= 100) {
+                printf("\nYou can't add books anymore, limit reached! ");
+                break;
+            }
+            globalCounter = insertBook(bookArchive, globalCounter);
+            printf ("%d", globalCounter);
+            break;
+        case 2: 
+            printf("\nYou choose to ---SHOW ALL BOOKS---");
+            showAllBook(bookArchive, globalCounter);
+            break;
+        case 3: 
+            printf("\nYou choose to ---SEARCH BOOKS BY CODE---");
+            SearchByCode(bookArchive, globalCounter);
+            break;
+        case 12:
+            printf("\nThank you for using this management app! See you next time...\n");
+            cicleVar = 0;
+            break;
+        default:
+            printf("\nChoice must be from 1 to 12\n");
+            break;
+        }
+    }
+    
 }
 
 #endif
