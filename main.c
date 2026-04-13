@@ -8,5 +8,5 @@ Book archive[MAX];
 
 
 int main () {
-    printMenu(archive);
+    printMenu(archive,genres);
 }
