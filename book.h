@@ -3,8 +3,7 @@
 
 #include <string.h>
 #include <stdio.h>
-typedef struct 
-{
+typedef struct  {
     int code;
     char title[100];
     char author[100];
@@ -12,17 +11,20 @@ typedef struct
     int avaible_copies;
     int total_copies;
     float price;
-    char genre[50];
+    char genre[100];
 } Book;
 
 //check functions 
 
 //quando è char la funzione non puo tornare una stringa intera, quindi non torniamo nulla ma assegnamo la stringa all'array inserito nei parametri
 void checkCharCicle(char prompt[], char dest[]){
-    while(1)
-    {
+    while(1) {
         printf("%s", prompt);
-        scanf("%s", dest);
+        if (scanf(" %99[^\n]", dest) != 1) {
+            // Handle EOF or read error
+            dest[0] = '\0';
+            break;
+        }
         if (strlen(dest) > 99) {
             printf("troppi caratteri\n");
             int c;
@@ -33,12 +35,12 @@ void checkCharCicle(char prompt[], char dest[]){
         }
     }
 }
-
+//lo scnaf torna qualsiasi cosa diversa da 1 quando vi è un errore legato al tipo che si aspetta (se c'è unp scanf che si aspetta un flaot e inserisco un carattere allora tornerà qualcosa != 1)
 //quando la funzione controlla i numeri torna sempre un float 
+
 float checkFloatCicle(char prompt[]){
     float a;
-    while(1)
-    {
+    while(1) {
         printf("%s", prompt);
         if (scanf("%f", &a) != 1) {
             printf("\nNon inserire caratteri! Inserisci numeri!");
@@ -56,7 +58,7 @@ float checkFloatCicle(char prompt[]){
 
 //insert book function 
 
-int insertBook( Book arr[], int c) {
+int insertBook( Book arr[], int c, char gen[][10]) {
     arr[c].code = c;
     checkCharCicle("\ninsert book title: ", arr[c].title);
     checkCharCicle("\ninsert the book's author: ", arr[c].author);
@@ -72,7 +74,19 @@ int insertBook( Book arr[], int c) {
         }
     }
     arr[c].price=checkFloatCicle("\ninsert the book's price per unit: ");
-    checkCharCicle("\ninsert the book's genre: ", arr[c].genre);
+    printf("\n--- CHOOSE A GENRE ---\n");
+    for (int i = 0; i < 4; i++){
+        printf("\n%d. %s", i + 1, gen[i]);
+    }
+    while (1) {
+        int choiceGen = checkFloatCicle("\nYour choice: ");
+        if (choiceGen <= 0 || choiceGen > 4 ) {
+            printf("\n Choose an appropiate value!");
+        } else {
+            strcat(arr[c].genre, gen[choiceGen - 1]);
+            break;
+        }
+    }
     return c + 1; 
 }
 
@@ -98,7 +112,7 @@ void showAllBook( Book archive[] , int countArr) {
     }
 }
 //count by genre function
-void count_by_genre(Book archive[], char gen[][10], int countArr)
+void countByGenre(Book archive[], char gen[][10], int countArr)
 {
     int count_genre[4] = {0};  
     int i,j;
@@ -157,15 +171,13 @@ int SearchByCode( Book archive[] , int countArr, int needCode){
         return 1;
 }
 
-void fakeLoading(){}//opzionale: fare un finto loading con la libreria system e pulire lo schermo
+void  Loading(){}//opzionale: fare un finto loading con la libreria system e pulire lo schermo
 
-int ShowAndSelect(Book archive[],int countArr){
+int ShowAndSelect(Book archive[],int countArr) {
     int choice,bookCode;
-    while (1)
-    {
+    while (1) {
         choice = checkFloatCicle("\nDo you wish to view all books or select it by code now?\n 1 - View all books.\n 2 - Select by code.\n 0 - Back to menu'\n");
-        switch(choice)
-        {
+        switch(choice) {
             case 0:
                 return -1;
             case 1:
@@ -182,11 +194,11 @@ int ShowAndSelect(Book archive[],int countArr){
 }
 
 
-void updateAvCopies(Book archive[],int countArr, int bookCode, int special){
+void updateAvCopies(Book archive[],int countArr, int bookCode) {
     int index,newCopies;
     if (bookCode == -1){return;}//esce
-    while(1){
-        for(int i=0 ; i<countArr ; i++){
+    while(1) {
+        for(int i = 0; i < countArr ; i++){
             if(archive[i].code == bookCode){
                 printf("\n ------ HERE'S THE BOOK INFO ------ \n");
                 printf("\nIt has: %d of total copies\n ",archive[i].total_copies);
@@ -194,63 +206,123 @@ void updateAvCopies(Book archive[],int countArr, int bookCode, int special){
                 index=i;
             }
         }
-        if (special== 1){
-            newCopies=checkFloatCicle("\nInsert the number of copies returned, they will be added back: ");
-            if((newCopies+archive[index].avaible_copies)>archive[index].total_copies){
-                printf("\nNumber of available copies can't be more than the total number of copies, please try again\n");
-                continue;
-            }
-            archive[index].avaible_copies+=newCopies;
-            return;
-        }else if(special== -1){
-            newCopies=checkFloatCicle("\nInsert the number of copies to be loaned, they will be removed: ");
-            if((archive[index].avaible_copies-newCopies)<0){
-                printf("\nNumber of available copies can't be negative, please try again\n");
-                continue;
-            }
-            archive[index].avaible_copies-=newCopies;
-            return;
-        }
-        newCopies=checkFloatCicle("\nInsert the number of new copies: ");
-        if(newCopies>archive[index].total_copies){
+        newCopies = checkFloatCicle("\nInsert the number of new copies: ");
+        if(newCopies > archive[index].total_copies) {
             printf("\nNumber of available copies can't be more than the total number of copies, please try again\n");
             continue;
         }
-        archive[index].avaible_copies=newCopies;
+        archive[index].avaible_copies = newCopies;
         printf("\nNumber successfully updated!\n");
         return;
     }
     
 }
 
-void updateUnitCost(Book archive[],int countArr, int bookCode){
+void updateUnitCost(Book archive[],int countArr, int bookCode) {
     int index;
     float newPrice;
-    if (bookCode == -1){return;}//esce
-    while(1){
-        for(int i=0 ; i<countArr ; i++){
+    if (bookCode == -1) {return;} //esce
+    while(1) {
+        for(int i = 0 ; i < countArr ; i++){
             if(archive[i].code == bookCode){
                 printf("\n ------ HERE'S THE BOOK INFO ------ \n");
                 printf("\nIt has a price of :%0.2f\n for unit",archive[i].price);
                 index=i;
             }
         }
-        newPrice=checkFloatCicle("\nInsert the new price: ");
+        newPrice = checkFloatCicle("\nInsert the new price: ");
         archive[index].price=newPrice;
         printf("\nPrice successfully updated!\n");
         return;
     }
 }
 
-void registerLoanOrReturn (Book archive[], int countArr, int loanReturn) {
-    //se loanregister è 1 allora registrerà un return, se -1 registerà un loan
+// void registerLoanOrReturn (Book archive[], int countArr, int loanReturn) {
+//     //se loanregister è 1 allora registrerà un return, se -1 registerà un loan
+//     printf("\nWhich book's loan do you want to register?");
+//     int bookCode = ShowAndSelect(archive, countArr);
+//     updateAvCopies(archive, countArr, bookCode, loanReturn);
+//     if (loanReturn == -1) {
+//         printf("\nLoan registred!");
+//     } else {
+//         printf("\nReturn registred!");
+//     }
+// }
+
+void registerLoan(Book archive[], int countArr) {
+    int newCopies, index;
     printf("\nWhich book's loan do you want to register?");
     int bookCode = ShowAndSelect(archive, countArr);
-    updateAvCopies(archive, countArr, bookCode, loanReturn);
-    if (loanReturn == -1) {
+    while (1) {
+        for(int i = 0; i < countArr ; i++){
+            if(archive[i].code == bookCode){
+                    printf("\n ------ HERE'S THE BOOK INFO ------ \n");
+                    printf("\nIt has: %d of total copies\n ",archive[i].total_copies);
+                    printf("\nIt has: %d of available copies\n ",archive[i].avaible_copies);
+                    index=i;
+                }
+            }
+        newCopies = checkFloatCicle("\nInsert the number of copies to be loaned, they will be removed: ");
+        if((archive[index].avaible_copies - newCopies) < 0) {
+            printf("\nNumber of available copies can't be negative, please try again\n");
+            continue;
+        }
+        archive[index].avaible_copies -= newCopies;
         printf("\nLoan registred!");
-    } else {
+        return;
+    }
+}
+
+void registerReturn (Book archive[], int countArr) {
+    int newCopies, index;
+    printf("\nWhich book's return do you want to register?");
+    int bookCode = ShowAndSelect(archive, countArr);
+    while (1) {
+        for(int i = 0; i < countArr ; i++){
+            if(archive[i].code == bookCode) {
+                printf("\n ------ HERE'S THE BOOK INFO ------ \n");
+                printf("\nIt has: %d of total copies\n ",archive[i].total_copies);
+                printf("\nIt has: %d of available copies\n ",archive[i].avaible_copies);
+                index=i;
+            }
+        }
+        newCopies = checkFloatCicle("\nInsert the number of copies returned, they will be added back: ");
+        if((newCopies + archive[index].avaible_copies) > archive[index].total_copies) {
+            printf("\nNumber of available copies can't be more than the total number of copies, please try again\n");
+            continue;
+        }
+        archive[index].avaible_copies += newCopies;
         printf("\nReturn registred!");
+        return;
+    }
+}
+
+void totalArchiveValue(Book archive[], int countArr) {
+    if (countArr == 0) {
+        printf("\nThere are no books in the archive!\n");
+        return;
+    }
+    float totalValue = 0.0;
+
+    for (int i = 0; i < countArr; i++) {
+        totalValue += archive[i].price * archive[i].total_copies;
+    }
+
+    printf("\n------ TOTAL VALUE ARCHIVE ------\n");
+    printf("Total number of books (titles): %d\n", countArr);
+    printf("Total value archive: %.2f EUR\n", totalValue);
+}
+
+void calculateAverageYear(Book archive[],int countArr)  {
+    if (countArr == 0){                                     //controle se non ci sono libli
+        printf("\n No books available to calculate the average\n");
+    } else {
+        int sum = 0 ;                                       //variabile per sommare tutti gli anni di pubblicazione
+        for (int i =0;i < countArr; i++) {
+            sum+=archive[i].release_year;                   //aggiungiamo l anno di pubblicazione del libro corrente alla somma 
+        } 
+        float avg= sum / countArr;                          // calcolare la media
+        printf("\n Average of years of public is : %0.2f",avg); 
     }
 }
 
@@ -281,7 +353,7 @@ void printMenu(Book bookArchive[], char gen[][10]) {
                 printf("\nYou can't add books anymore, limit reached! ");
                 break;
             }
-            globalCounter = insertBook(bookArchive, globalCounter);
+            globalCounter = insertBook(bookArchive, globalCounter, gen);
             printf ("%d", globalCounter);
             break;
         case 2: 
@@ -294,7 +366,7 @@ void printMenu(Book bookArchive[], char gen[][10]) {
             break;
         case 4:
             printf("\nYou choose to ---UPDATE AVAILABLE COPIES---");
-            updateAvCopies(bookArchive, globalCounter,ShowAndSelect(bookArchive,globalCounter),0);
+            updateAvCopies(bookArchive, globalCounter,ShowAndSelect(bookArchive,globalCounter));
             break;
         case 5:
             printf("\nYou choose to ---UPDATE UNIT PRICE---");
@@ -302,15 +374,23 @@ void printMenu(Book bookArchive[], char gen[][10]) {
             break;
         case 6:
             printf("\nYou choose to ---REGISTER A LOAN---");
-            registerLoanOrReturn(bookArchive, globalCounter, -1);
+            registerLoan(bookArchive, globalCounter);
             break;
         case 7:
             printf("\nYou choose to ---REGISTER A RETURN---");
-            registerLoanOrReturn(bookArchive, globalCounter, 1);
+            registerReturn(bookArchive, globalCounter);
+            break;
+        case 8: 
+            printf("\nYou choose to --- CALCULATE TOTAL ARCHIVE VALUE ---");
+            totalArchiveValue(bookArchive, globalCounter);
             break;
         case 9:
             printf("\nYou choose to ---COUNT BOOKS BY GENRE---");
-            count_by_genre(bookArchive, gen, globalCounter);
+            countByGenre(bookArchive, gen, globalCounter);
+            break;
+        case 11:
+            printf("\nYou choose to ---CALCULTE AVARAGE PUBLICATION YEAR---");
+            calculateAverageYear(bookArchive, globalCounter);
             break;
         case 12:
             printf("\nThank you for using this management app! See you next time...\n");
