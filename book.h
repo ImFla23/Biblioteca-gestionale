@@ -103,12 +103,12 @@ int insertBook( Book arr[], int c, char gen[][10]) {
 
 
 void showAllBook( Book archive[] , int countArr) {
-
+    
+    fakeLoading();
     if (countArr == 0) {
-        printf("There isn't any book saved yet");
+        printf("\nThere isn't any book saved yet");
     }
 
-    fakeLoading();
     
     for(int i =0 ; i<countArr ; i++) {
 
@@ -124,12 +124,16 @@ void showAllBook( Book archive[] , int countArr) {
     }
 }
 
-void countByGenre(Book archive[], char gen[][10], int countArr)
-{
+void countByGenre(Book archive[], char gen[][10], int countArr) {
+    fakeLoading();
+    if (countArr == 0) {
+        printf("\nThere are no books in the archive!\n");
+        return;
+    }
+    
     int count_genre[MAX_GENRE] = {0};  
     int i,j;
 
-    fakeLoading();
 
     for ( i = 0; i < MAX_GENRE; i++) {
         for ( j = 0; j < countArr; j++)   {
@@ -146,6 +150,11 @@ void countByGenre(Book archive[], char gen[][10], int countArr)
 }
 
 int SearchByCode( Book archive[] , int countArr, int needCode){
+    if (countArr == 0) {
+        printf("\nThere are no books in the archive!\n");
+        return 0;
+    }
+    
     int a = 1; //per ciclo while
     int codeInsert;
     int found = 0; 
@@ -183,6 +192,11 @@ int SearchByCode( Book archive[] , int countArr, int needCode){
 }
 
 int ShowAndSelect(Book archive[],int countArr) {
+    if (countArr == 0) {
+        printf("\nThere are no books in the archive!\n");
+        return 0;
+    }
+
     int choice,bookCode;
     while (1) {
         choice = checkFloatCicle("\nDo you wish to view all books or select it by code now?\n 1 - View all books.\n 2 - Select by code.\n 0 - Back to menu'\n");
@@ -204,6 +218,9 @@ int ShowAndSelect(Book archive[],int countArr) {
 
 
 void updateAvCopies(Book archive[],int countArr, int bookCode) {
+    if (countArr == 0) {
+        return;
+    }
     int index,newCopies;
     if (bookCode == -1){return;}//esce
     while(1) {
@@ -229,6 +246,9 @@ void updateAvCopies(Book archive[],int countArr, int bookCode) {
 }
 
 void updateUnitCost(Book archive[],int countArr, int bookCode) {
+    if (countArr == 0) {
+        return;
+    }
     int index;
     float newPrice;
     if (bookCode == -1) {return;} //esce
@@ -261,6 +281,11 @@ void updateUnitCost(Book archive[],int countArr, int bookCode) {
 // }
 
 void registerLoan(Book archive[], int countArr) {
+    if (countArr == 0) {
+        printf("\nThere are no books in the archive!\n");
+        return;
+    }
+
     int newCopies, index;
     printf("\nWhich book's loan do you want to register?");
     int bookCode = ShowAndSelect(archive, countArr);
@@ -286,6 +311,11 @@ void registerLoan(Book archive[], int countArr) {
 }
 
 void registerReturn (Book archive[], int countArr) {
+    if (countArr == 0) {
+        printf("\nThere are no books in the archive!\n");
+        return;
+    }
+
     int newCopies, index;
     printf("\nWhich book's return do you want to register?");
     int bookCode = ShowAndSelect(archive, countArr);
@@ -312,7 +342,7 @@ void registerReturn (Book archive[], int countArr) {
 
 void findBookWithHighestNumberOfCopies(Book archive[], int countArr) {
     fakeLoading();
-    
+
     if (countArr == 0) {
         printf("\nThere are no books in the archive!\n");
         return;
