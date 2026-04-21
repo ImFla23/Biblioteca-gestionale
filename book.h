@@ -292,6 +292,7 @@ void registerLoan(Book archive[], int countArr) {
     int newCopies, index;
     printf("\nWhich book's loan do you want to register?");
     int bookCode = ShowAndSelect(archive, countArr);
+    if (bookCode == -1){return;}//esce
     while (1) {
         for(int i = 0; i < countArr ; i++){
             if(archive[i].code == bookCode){
@@ -322,6 +323,7 @@ void registerReturn (Book archive[], int countArr) {
     int newCopies, index;
     printf("\nWhich book's return do you want to register?");
     int bookCode = ShowAndSelect(archive, countArr);
+    if (bookCode == -1){return;}//esce
     while (1) {
         for(int i = 0; i < countArr ; i++){
             if(archive[i].code == bookCode) {
